@@ -209,6 +209,7 @@ namespace sidgui
                 }
 
                 var decodeString = EntryBox.Text = EntryBox.Text.Trim();
+                bool addByteFormatting = false;
 
                 //! TODO: Just add a toggle in the UI for endian, and strip spaces
                 // Try and handle sid's provided as an array of bytes rather than a hex ulong
@@ -217,18 +218,20 @@ namespace sidgui
                     var buff = new StringBuilder();
                     string tmp = EntryBox.Text.Replace(" ", string.Empty);
 
-                    for (var i = 14; i >= 0; i -= 2)
+                    for (var i = tmp.Length - 2; i >= 0; i -= 2)
                     {
                         buff.Append($"{tmp[i]}{tmp[i + 1]}");
                     }
 
                     decodeString = buff.ToString();
+                    addByteFormatting = true;
                 }
 
 
                 var sid = new SID(SIDBases, decodeString);
 
-                DecoderOutputBox.AppendLine($"{EntryBox.Text} -> " + sid.DecodedSID);
+                //! Might remove the hex formatting. or make it something smaller like wrapping with {} | []
+                DecoderOutputBox.AppendLine($"{(addByteFormatting ? "0x" + EntryBox.Text.Replace(" ", ", 0x") : EntryBox.Text)} -> " + sid.DecodedSID);
             }
             else {
                 echo($"Unknown mode active ({(byte) ActiveMode:X})");
