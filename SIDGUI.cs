@@ -4,6 +4,7 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Windows.Forms;
 using static sidgui.SIDGUI;
@@ -30,6 +31,8 @@ namespace sidgui
         //--|   Variable Declarations   |--\\
         //=================================\\
         #region [Variable Declarations]
+
+        private const string Version = "1.01.04";
 
         private Mode ActiveMode = Mode.None;
 
@@ -241,7 +244,7 @@ namespace sidgui
 
         private void InfoBtn_Click(object sender, EventArgs e)
         {
-
+            MessageBox.Show("Created By TheMagicalBlob (nkm)\n\nFor SID encoding: WRITE ME\n\nFor SID Decoding: WRITE ME, TOO\n\nVersion " + Version, $"{nameof(SIDGUI)} Info.");
         }
 
 
