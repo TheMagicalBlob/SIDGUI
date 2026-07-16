@@ -729,19 +729,29 @@ namespace sidgui
         }
 
 
+
+        /// <summary>
+        /// Unload all the loaded sidbases, in case there was an issue with one of them
+        /// </summary>
         public void UnloadSIDBases()
         {
             SIDBases = Array.Empty<sidbase>();
 
-            // Project-specific line
-            var browseBtn = sidgui.SIDGUI.Venat.Controls.Find("LoadSIDBaseBtn", true).FirstOrDefault();
-            if ((browseBtn ?? default) != default)
+            // Project-specific lines
             {
-                browseBtn.Text = "Load an SIDBase";
-            }
 
-            var decoderOutputBox = (RichTextBox) sidgui.SIDGUI.Venat.Controls.Find("DecoderOutputBox", true).FirstOrDefault();
-            decoderOutputBox.AppendLine("An sidbase.bin is required to decode strings. Please select one with the Load sidbase button.");
+                var browseBtn = sidgui.SIDGUI.Venat.Controls.Find("LoadSIDBaseBtn", true).FirstOrDefault();
+                if ((browseBtn ?? default) != default)
+                {
+                    browseBtn.Text = "Load an SIDBase";
+                }
+
+                var decoderOutputBox = (RichTextBox) sidgui.SIDGUI.Venat.Controls.Find("DecoderOutputBox", true).FirstOrDefault();
+                if ((decoderOutputBox ?? default) != default)
+                {
+                    decoderOutputBox.AppendLine("An sidbase.bin is required to decode strings. Please select one with the Load sidbase button.");
+                }
+            }
         }
 
 
