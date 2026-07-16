@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Text;
 using System.Windows.Forms;
 using static sidgui.SIDGUI;
@@ -32,16 +31,24 @@ namespace sidgui
         //=================================\\
         #region [Variable Declarations]
 
-        private const string Version = "1.01.04";
+        private const string Version = "1.02.13";
 
-        private Mode ActiveMode = Mode.None;
-
-        enum Mode
+        private enum Mode
         {
             None = -1,
             Decode = 0,
             Encode
         }
+
+        private enum Endian //! reminder: PS4: Little & PS3: Big
+        {
+            None = -1,
+            Little = 0,
+            Big
+        }
+
+        private Mode ActiveMode = Mode.None;
+        private Endian ActiveEndian = Endian.None;
 
 
         /// <summary>
@@ -50,14 +57,6 @@ namespace sidgui
         private SIDBase SIDBases;
 
         private byte InvalidDecoderAttempts = 0;
-
-        /// <summary> If true, show the string representation of the raw SID's instead of UNKNOWN_SID_64 when an id can not be decoded. </summary>
-        public static bool ShowUnresolvedSIDs = true;
-
-#if DEBUG
-        /// <summary> If true, show the string representation of the raw SID's instead of INVALID_SID_64 when an invalid sid has been provided. </summary>
-        public static bool ShowInvalidSIDs = true;
-#endif
         #endregion
 
 
@@ -92,6 +91,7 @@ namespace sidgui
 #else
             SetToolMode(Mode.Decode);
 #endif
+            SetToolEndian(Endian.Big); // By default, expect a hex ulong
 
 
 
@@ -103,6 +103,10 @@ namespace sidgui
 
 
             SIDBases = new SIDBase();
+            SID.ShowUnresolvedSIDs = false;
+#if DEBUG
+            SID.ShowInvalidSIDs = false;
+#endif
 
             var workingDirectory = Directory.GetCurrentDirectory();
 
@@ -161,6 +165,29 @@ namespace sidgui
                 ProcessEntryBtn.Text = "Decode";
                 DecoderOutputBox.Visible = !(EncoderOutputBox.Visible = false);
             }
+        }
+
+
+        private void SetToolEndian(Endian Endian)
+        {
+            if (Endian == ActiveEndian)
+            {
+                return;
+            }
+
+
+            ActiveEndian = Endian;
+
+            if (ActiveEndian == Endian.Little)
+            {
+                BigEndianBtn.FlatAppearance.BorderColor = Color.Red;
+                LittleEndianBtn.FlatAppearance.BorderColor = Color.Green;
+            }
+            else if (ActiveEndian == Endian.Big)
+            {
+                BigEndianBtn.FlatAppearance.BorderColor = Color.Green;
+                LittleEndianBtn.FlatAppearance.BorderColor = Color.Red;
+            }
 
 
         }
@@ -180,7 +207,7 @@ namespace sidgui
         //--|   Event Handler Declarations   |--\\
         //======================================\\
         #region [Event Handler Declarations]
-        
+
         private void EnterDecoderMode(object _, EventArgs __)
         {
             SetToolMode(Mode.Decode);
@@ -211,15 +238,13 @@ namespace sidgui
                     return;
                 }
 
-                var decodeString = EntryBox.Text = EntryBox.Text.Trim();
-                bool addByteFormatting = false;
+                var decodeString = EntryBox.Text = EntryBox.Text.Trim().Replace(" ", string.Empty);
 
-                //! TODO: Just add a toggle in the UI for endian, and strip spaces
                 // Try and handle sid's provided as an array of bytes rather than a hex ulong
-                if (EntryBox.Text.Length - EntryBox.Text.Replace(" ", string.Empty).Length == 7)
+                if (ActiveEndian == Endian.Little)
                 {
-                    var buff = new StringBuilder();
-                    string tmp = EntryBox.Text.Replace(" ", string.Empty);
+                    string tmp = EntryBox.Text;
+                    var buff = new StringBuilder(tmp.Length);
 
                     for (var i = tmp.Length - 2; i >= 0; i -= 2)
                     {
@@ -227,24 +252,28 @@ namespace sidgui
                     }
 
                     decodeString = buff.ToString();
-                    addByteFormatting = true;
                 }
 
 
                 var sid = new SID(SIDBases, decodeString);
 
                 //! Might remove the hex formatting. or make it something smaller like wrapping with {} | []
-                DecoderOutputBox.AppendLine($"{(addByteFormatting ? "0x" + EntryBox.Text.Replace(" ", ", 0x") : EntryBox.Text)} -> " + sid.DecodedSID);
+                DecoderOutputBox.AppendLine($"[{(ActiveEndian)}] {EntryBox.Text} -> " + sid.DecodedSID);
             }
             else {
-                echo($"Unknown mode active ({(byte) ActiveMode:X})");
+                var msg = $"Unknown mode active ({(byte)ActiveMode:X}). Something has gone terribly wrong- off we screw.";
+#if DEBUG
+                throw new Exception(msg);
+#else
+                MessageBox.Show(msg);
+#endif
             }
         }
 
 
         private void InfoBtn_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Created By TheMagicalBlob (nkm)\n\nFor SID encoding: WRITE ME\n\nFor SID Decoding: WRITE ME, TOO\n\nVersion " + Version, $"{nameof(SIDGUI)} Info.");
+            MessageBox.Show("Created By TheMagicalBlob (nkm)\n\nFor SID encoding: Just provide a string to encode, no SIDBase needed. All hashes are 64-bit FNV-1a, Displayed as hex ulong.\n\nFor SID Decoding: An SIDBase with the decoded version of the hash is required. The application's working folder is checked for an sidbase on boot, but multiple SIDBases can be loaded via the Load SIDBase button.\n\nNOTE: Prepending a value with 0x will ignore Endian settings, and just load the value as a hex ulong rather than reading it as an array of bytes.\n\n\nVersion " + Version, $"{nameof(SIDGUI)} Info.");
         }
 
 
@@ -303,6 +332,16 @@ namespace sidgui
             var sid = SIDBases.DecodeSIDHash(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
 
             echo($"Emoty SID tst: {sid} ({sid.Length})");
+        }
+
+        private void LittleEndianBtn_Click(object sender, EventArgs e)
+        {
+            SetToolEndian(Endian.Little);
+        }
+
+        private void BigEndianBtn_Click(object sender, EventArgs e)
+        {
+            SetToolEndian(Endian.Big);
         }
     }
 
@@ -503,7 +542,16 @@ namespace sidgui
         /// Represents an item with an unspecified name.
         /// </summary>
         public static readonly SID Empty = new SID(string.Empty, 0x0000000000000000);
-        #endregion
+
+
+        /// <summary> If true, show the string representation of the raw SID's instead of UNKNOWN_SID_64 when an id can not be decoded. </summary>
+        public static bool ShowUnresolvedSIDs = true;
+
+#if DEBUG
+        /// <summary> If true, show the string representation of the raw SID's instead of INVALID_SID_64 when an invalid sid has been provided. </summary>
+        public static bool ShowInvalidSIDs = true;
+#endif
+#endregion
     }
 
 
@@ -560,11 +608,11 @@ namespace sidgui
                 var rawSIDBase = File.ReadAllBytes(SIDBasePath);
                 if (rawSIDBase.Length < 0x18)
                 {
-    #if DEBUG
+#if DEBUG
                     throw new InvalidDataException($"ERROR: Invalid length for sidbase.bin (0x{rawSIDBase.Length:X} < 0x18; is it corrupted?)");
-    #else
+#else
                     MessageBox.Show($"ERROR: Invalid length for sidbase.bin (0x{rawSIDBase.Length:X} < 0x18; is it corrupted?)", "The provided sidbase was unable to be loaded.");
-    #endif
+#endif
                 }
 
 
@@ -599,11 +647,11 @@ namespace sidgui
                 // Just-In-Case.
                 if (HashTableRawLength >= int.MaxValue)
                 {
-    #if DEBUG
+#if DEBUG
                     throw new InvalidDataException($"ERROR: Sidbase is too large for 64-bit addresses, blame Microsoft for limiting me to that, then blame me for not bothering to try splitting the sidbases. Do that yourself.");
-    #else
+#else
                     MessageBox.Show($"ERROR: Sidbase is too large for 64-bit addresses, blame Microsoft for limiting me to that, then blame me for not bothering to try splitting the sidbases.");
-    #endif
+#endif
                 }
 
 

@@ -45,6 +45,10 @@ namespace sidgui
             this.EntryBox = new sidgui.TextBox();
             this.ProcessEntryBtn = new System.Windows.Forms.Button();
             this.unnamedPanel = new sidgui.Panel();
+            this.label1 = new sidgui.Label();
+            this.LittleEndianBtn = new System.Windows.Forms.Button();
+            this.BigEndianBtn = new System.Windows.Forms.Button();
+            this.label2 = new sidgui.Label();
             this.DebugClearSIDBasesBtn = new System.Windows.Forms.Button();
             this.LoadSIDBaseBtn = new System.Windows.Forms.Button();
             this.SeparatorLine1 = new sidgui.Label();
@@ -167,9 +171,9 @@ namespace sidgui
             this.EntryBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(42)))), ((int)(((byte)(42)))), ((int)(((byte)(42)))));
             this.EntryBox.Font = new System.Drawing.Font("Segoe UI Semibold", 7.5F);
             this.EntryBox.ForeColor = System.Drawing.SystemColors.Window;
-            this.EntryBox.Location = new System.Drawing.Point(108, 55);
+            this.EntryBox.Location = new System.Drawing.Point(210, 55);
             this.EntryBox.Name = "EntryBox";
-            this.EntryBox.Size = new System.Drawing.Size(598, 21);
+            this.EntryBox.Size = new System.Drawing.Size(500, 21);
             this.EntryBox.TabIndex = 27;
             this.EntryBox.TabStop = false;
             this.EntryBox.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.EntryBoxEnterButtonPressed);
@@ -190,6 +194,10 @@ namespace sidgui
             // 
             // unnamedPanel
             // 
+            this.unnamedPanel.Controls.Add(this.label1);
+            this.unnamedPanel.Controls.Add(this.LittleEndianBtn);
+            this.unnamedPanel.Controls.Add(this.BigEndianBtn);
+            this.unnamedPanel.Controls.Add(this.label2);
             this.unnamedPanel.Controls.Add(this.DebugClearSIDBasesBtn);
             this.unnamedPanel.Controls.Add(this.LoadSIDBaseBtn);
             this.unnamedPanel.Controls.Add(this.SeparatorLine1);
@@ -203,6 +211,55 @@ namespace sidgui
             this.unnamedPanel.Size = new System.Drawing.Size(799, 90);
             this.unnamedPanel.TabIndex = 3;
             // 
+            // label1
+            // 
+            this.label1.IsSeparatorLine = true;
+            this.label1.Location = new System.Drawing.Point(196, 1);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(11, 88);
+            this.label1.StretchToFitForm = false;
+            this.label1.TabIndex = 35;
+            this.label1.Text = "|\r\n|\r\n|\r\n|\r\n|\r\n|\r\n|\r\n";
+            // 
+            // LittleEndianBtn
+            // 
+            this.LittleEndianBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(12)))), ((int)(((byte)(12)))), ((int)(((byte)(12)))));
+            this.LittleEndianBtn.FlatAppearance.BorderColor = System.Drawing.SystemColors.Control;
+            this.LittleEndianBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.LittleEndianBtn.Location = new System.Drawing.Point(118, 29);
+            this.LittleEndianBtn.Name = "LittleEndianBtn";
+            this.LittleEndianBtn.Size = new System.Drawing.Size(53, 23);
+            this.LittleEndianBtn.TabIndex = 33;
+            this.LittleEndianBtn.Text = "Little";
+            this.LittleEndianBtn.UseVisualStyleBackColor = false;
+            this.LittleEndianBtn.Click += new System.EventHandler(this.LittleEndianBtn_Click);
+            // 
+            // BigEndianBtn
+            // 
+            this.BigEndianBtn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(12)))), ((int)(((byte)(12)))), ((int)(((byte)(12)))));
+            this.BigEndianBtn.FlatAppearance.BorderColor = System.Drawing.SystemColors.Control;
+            this.BigEndianBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.BigEndianBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BigEndianBtn.Location = new System.Drawing.Point(118, 54);
+            this.BigEndianBtn.Name = "BigEndianBtn";
+            this.BigEndianBtn.Size = new System.Drawing.Size(53, 23);
+            this.BigEndianBtn.TabIndex = 32;
+            this.BigEndianBtn.Text = "Big";
+            this.BigEndianBtn.UseVisualStyleBackColor = false;
+            this.BigEndianBtn.Click += new System.EventHandler(this.BigEndianBtn_Click);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Bold);
+            this.label2.IsSeparatorLine = false;
+            this.label2.Location = new System.Drawing.Point(98, 6);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(98, 13);
+            this.label2.StretchToFitForm = false;
+            this.label2.TabIndex = 34;
+            this.label2.Text = "Decoder Endian";
+            // 
             // DebugClearSIDBasesBtn
             // 
             this.DebugClearSIDBasesBtn.AccessibleRole = System.Windows.Forms.AccessibleRole.None;
@@ -210,7 +267,7 @@ namespace sidgui
             this.DebugClearSIDBasesBtn.FlatAppearance.BorderColor = System.Drawing.SystemColors.Control;
             this.DebugClearSIDBasesBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.DebugClearSIDBasesBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.DebugClearSIDBasesBtn.Location = new System.Drawing.Point(237, 29);
+            this.DebugClearSIDBasesBtn.Location = new System.Drawing.Point(339, 29);
             this.DebugClearSIDBasesBtn.Name = "DebugClearSIDBasesBtn";
             this.DebugClearSIDBasesBtn.Size = new System.Drawing.Size(114, 23);
             this.DebugClearSIDBasesBtn.TabIndex = 31;
@@ -225,7 +282,7 @@ namespace sidgui
             this.LoadSIDBaseBtn.FlatAppearance.BorderColor = System.Drawing.SystemColors.Control;
             this.LoadSIDBaseBtn.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.LoadSIDBaseBtn.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.LoadSIDBaseBtn.Location = new System.Drawing.Point(108, 29);
+            this.LoadSIDBaseBtn.Location = new System.Drawing.Point(210, 29);
             this.LoadSIDBaseBtn.Name = "LoadSIDBaseBtn";
             this.LoadSIDBaseBtn.Size = new System.Drawing.Size(126, 23);
             this.LoadSIDBaseBtn.TabIndex = 30;
@@ -316,6 +373,10 @@ namespace sidgui
         public Button ClearActiveOutputBtn;
         public Button LoadSIDBaseBtn;
         public Button DebugClearSIDBasesBtn;
+        private Label label1;
+        public Button LittleEndianBtn;
+        public Button BigEndianBtn;
+        private Label label2;
     }
 }
 
