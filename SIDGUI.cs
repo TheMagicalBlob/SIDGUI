@@ -208,13 +208,25 @@ namespace sidgui
                     return;
                 }
 
+                var decodeString = EntryBox.Text = EntryBox.Text.Trim();
 
-                var sid = new SID(SIDBases, EntryBox.Text);
-
-                if (sid.RawSID == 0)
+                //! TODO: Just add a toggle in the UI for endian, and strip spaces
+                // Try and handle sid's provided as an array of bytes rather than a hex ulong
+                if (EntryBox.Text.Length - EntryBox.Text.Replace(" ", string.Empty).Length == 7)
                 {
-                    DecoderOutputBox.AppendLine("Invalid SID");
+                    var buff = new StringBuilder();
+                    string tmp = EntryBox.Text.Replace(" ", string.Empty);
+
+                    for (var i = 14; i >= 0; i -= 2)
+                    {
+                        buff.Append($"{tmp[i]}{tmp[i + 1]}");
+                    }
+
+                    decodeString = buff.ToString();
                 }
+
+
+                var sid = new SID(SIDBases, decodeString);
 
                 DecoderOutputBox.AppendLine($"{EntryBox.Text} -> " + sid.DecodedSID);
             }
@@ -279,6 +291,13 @@ namespace sidgui
             SIDBases?.UnloadSIDBases();
         }
         #endregion
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var sid = SIDBases.DecodeSIDHash(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0 });
+
+            echo($"Emoty SID tst: {sid} ({sid.Length})");
+        }
     }
 
 
@@ -777,6 +796,11 @@ namespace sidgui
 
 
                 expectedHash = BitConverter.ToUInt64(BytesToDecode, 0);
+
+                if (expectedHash == 0)
+                {
+                    return string.Empty;
+                }
 
 
                 // check whether or not the chunk can be evenly split; if not, check
