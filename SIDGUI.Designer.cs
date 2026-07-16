@@ -172,7 +172,6 @@ namespace sidgui
             this.EntryBox.Size = new System.Drawing.Size(598, 21);
             this.EntryBox.TabIndex = 27;
             this.EntryBox.TabStop = false;
-            this.EntryBox.Text = "C7B0F9AD15CF8832";
             this.EntryBox.PreviewKeyDown += new System.Windows.Forms.PreviewKeyDownEventHandler(this.EntryBoxEnterButtonPressed);
             // 
             // ProcessEntryBtn
@@ -230,7 +229,7 @@ namespace sidgui
             this.LoadSIDBaseBtn.Name = "LoadSIDBaseBtn";
             this.LoadSIDBaseBtn.Size = new System.Drawing.Size(126, 23);
             this.LoadSIDBaseBtn.TabIndex = 30;
-            this.LoadSIDBaseBtn.Text = "Load another SIDBase";
+            this.LoadSIDBaseBtn.Text = "Load an SIDBase";
             this.LoadSIDBaseBtn.UseVisualStyleBackColor = false;
             this.LoadSIDBaseBtn.Click += new System.EventHandler(this.LoadSIDBaseBtn_Click);
             // 

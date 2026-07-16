@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -30,11 +31,12 @@ namespace sidgui
         //=================================\\
         #region [Variable Declarations]
 
-        private Mode ActiveMode = 0;
+        private Mode ActiveMode = Mode.None;
 
-        enum Mode : byte
+        enum Mode
         {
-            Decode,
+            None = -1,
+            Decode = 0,
             Encode
         }
 
@@ -124,7 +126,7 @@ namespace sidgui
 
             if (SIDBases.LoadedSIDBaseCount < 1)
             {
-                DecoderOutputBox.Text = "An sidbase.bin is required to decode strings. Please select one with the Load sidbase button.";
+                DecoderOutputBox.AppendLine("An sidbase.bin is required to decode strings. Please select one with the Load sidbase button.");
             }
         }
 #pragma warning restore IDE1006
@@ -205,7 +207,16 @@ namespace sidgui
                     }
                     return;
                 }
-                DecoderOutputBox.AppendLine($"{EntryBox.Text} -> " + new SID(SIDBases, EntryBox.Text).DecodedSID);
+
+
+                var sid = new SID(SIDBases, EntryBox.Text);
+
+                if (sid.RawSID == 0)
+                {
+                    DecoderOutputBox.AppendLine("Invalid SID");
+                }
+
+                DecoderOutputBox.AppendLine($"{EntryBox.Text} -> " + sid.DecodedSID);
             }
             else {
                 echo($"Unknown mode active ({(byte) ActiveMode:X})");
@@ -330,17 +341,25 @@ namespace sidgui
         /// <param name="EncodedSID"> The encoded string id as a sting. </param>
         public SID(SIDBase SIDBase, string EncodedSID)
         {
-            if (!ulong.TryParse(EncodedSID.StartsWith("0x") ? EncodedSID.Substring(2) : EncodedSID, System.Globalization.NumberStyles.HexNumber, null, out var rawSID))
+            RawSID = 0;
+            this.EncodedSID = EncodedSID;
+            
+            if (SIDBase == null)
             {
-                echo($"Invalid encoded id provided- unable to parse value. {nameof(RawSID)} will be zero");
-                rawSID = 0;
+                echo("Null SIDBase instance provided. unable to decode SID");
+                return;
+            }
+
+            if (!ulong.TryParse(EncodedSID?.Replace("0x", string.Empty), NumberStyles.HexNumber, CultureInfo.CurrentCulture, out var rawSID))
+            {
+                echo($"Invalid encoded id provided- unable to parse value.");
+                DecodedSID = "INVALID_SID_64";
+                return;
             }
 
 
-            this.DecodedSID = SIDBase.DecodeSIDHash(BitConverter.GetBytes(rawSID));
-            this.EncodedSID = EncodedSID;
-
             RawSID = rawSID;
+            DecodedSID = SIDBase.DecodeSIDHash(BitConverter.GetBytes(RawSID));
         }
 
 
@@ -371,7 +390,7 @@ namespace sidgui
         /// </summary>
         public SID(string DecodedSID, string EncodedSID)
         {
-            if (!ulong.TryParse(EncodedSID.StartsWith("0x") ? EncodedSID.Substring(2) : EncodedSID, System.Globalization.NumberStyles.HexNumber, null, out var rawSID))
+            if (!ulong.TryParse(EncodedSID.StartsWith("0x") ? EncodedSID.Substring(2) : EncodedSID, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out var rawSID))
             {
                 echo($"Invalid encoded id provided- unable to parse value. {nameof(RawSID)} will be zero");
                 rawSID = 0;
@@ -696,7 +715,7 @@ namespace sidgui
                     }
 
                     var decoderOutputBox = sidgui.SIDGUI.Venat.Controls.Find("DecoderOutputBox", true).FirstOrDefault();
-                    if (decoderOutputBox.Text == "An sidbase.bin is required to decode strings. Please select one with the Load sidbase button.")
+                    if (decoderOutputBox.Text == "An sidbase.bin is required to decode strings. Please select one with the Load sidbase button.\n")
                     {
                         decoderOutputBox.Text = "";
                     }
@@ -721,8 +740,8 @@ namespace sidgui
                 browseBtn.Text = "Load an SIDBase";
             }
 
-            var decoderOutputBox = sidgui.SIDGUI.Venat.Controls.Find("DecoderOutputBox", true).FirstOrDefault();
-            decoderOutputBox.Text = "An sidbase.bin is required to decode strings. Please select one with the Load sidbase button.";
+            var decoderOutputBox = (RichTextBox) sidgui.SIDGUI.Venat.Controls.Find("DecoderOutputBox", true).FirstOrDefault();
+            decoderOutputBox.AppendLine("An sidbase.bin is required to decode strings. Please select one with the Load sidbase button.");
         }
 
 
