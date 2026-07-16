@@ -31,7 +31,7 @@ namespace sidgui
         //=================================\\
         #region [Variable Declarations]
 
-        private const string Version = "1.02.13";
+        private const string Version = "1.02.14";
 
         private enum Mode
         {
@@ -241,7 +241,7 @@ namespace sidgui
                 var decodeString = EntryBox.Text = EntryBox.Text.Trim().Replace(" ", string.Empty);
 
                 // Try and handle sid's provided as an array of bytes rather than a hex ulong
-                if (ActiveEndian == Endian.Little)
+                if (!EntryBox.Text.StartsWith("0x") && ActiveEndian == Endian.Little)
                 {
                     string tmp = EntryBox.Text;
                     var buff = new StringBuilder(tmp.Length);
